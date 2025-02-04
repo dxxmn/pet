@@ -7,31 +7,26 @@ import (
 	"net/http"
 )
 
-type TaskRequest struct {
-	Task string `json:"task"`
+func CreateTasksHandler(w http.ResponseWriter, r *http.Request) {
+	var task Task
+	json.NewDecoder(r.Body).Decode(&task)
+	DB.Create(&task)
+	fmt.Fprint(w, "Успешно добавлено\n")
+	json.NewEncoder(w).Encode(task)
 }
 
-var task string
-
-func HelloHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello, "+task)
-}
-
-func PostHandler(w http.ResponseWriter, r *http.Request) {
-	var t TaskRequest
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&t)
-	if err != nil {
-		http.Error(w, "Неверный формат JSON", http.StatusBadRequest)
-		return
-	}
-	task = t.Task
-	fmt.Fprintln(w, "Task written: "+task)
+func GetTasksHandler(w http.ResponseWriter, r *http.Request) {
+	var tasks []Task
+	DB.Find(&tasks)
+	fmt.Fprint(w, "Все задания\n")
+	json.NewEncoder(w).Encode(tasks)
 }
 
 func main() {
+	initDB()
+	DB.AutoMigrate(&Task{})
 	router := mux.NewRouter()
-	router.HandleFunc("/api/hello", HelloHandler).Methods("GET")
-	router.HandleFunc("/api/post", PostHandler).Methods("POST")
+	router.HandleFunc("/api/tasks", CreateTasksHandler).Methods("POST")
+	router.HandleFunc("/api/tasks", GetTasksHandler).Methods("GET")
 	http.ListenAndServe(":8080", router)
 }
