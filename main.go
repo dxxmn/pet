@@ -1,40 +1,37 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
-	"strconv"
 )
 
-func HelloHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello, World!")
+type TaskRequest struct {
+	Task string `json:"task"`
 }
 
-var counter int
+var task string
 
-func GetHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		fmt.Fprintln(w, "Counter = ", strconv.Itoa(counter))
-	} else {
-		fmt.Fprintln(w, "Available only GET method")
-	}
+func HelloHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Hello, "+task)
 }
 
 func PostHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		counter++
-		fmt.Fprintln(w, "Counter enlarged by 1")
-	} else {
-		fmt.Fprintln(w, "Available only POST method")
+	var t TaskRequest
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&t)
+	if err != nil {
+		http.Error(w, "Неверный формат JSON", http.StatusBadRequest)
+		return
 	}
+	task = t.Task
+	fmt.Fprintln(w, "Task written: "+task)
 }
 
 func main() {
-	http.HandleFunc("/hello", HelloHandler)
-
-	http.HandleFunc("/post", PostHandler)
-
-	http.HandleFunc("/get", GetHandler)
-
-	http.ListenAndServe("localhost:8080", nil)
+	router := mux.NewRouter()
+	router.HandleFunc("/api/hello", HelloHandler).Methods("GET")
+	router.HandleFunc("/api/post", PostHandler).Methods("POST")
+	http.ListenAndServe(":8080", router)
 }
