@@ -5,22 +5,22 @@ import (
 	"pet/internal/database"
 )
 
-type TaskRepository interface {
+type TaskRepositoryInt interface {
 	CreateTask(task Task) (Task, error)
 	GetAllTasks() ([]Task, error)
 	UpdateTaskByID(id uint, task Task) (Task, error)
 	DeleteTaskByID(id uint) error
 }
 
-type taskRepository struct {
+type TaskRepositoryStr struct {
 	db *gorm.DB
 }
 
-func NewTaskRepository(db *gorm.DB) *taskRepository {
-	return &taskRepository{db: db}
+func NewTaskRepository(db *gorm.DB) *TaskRepositoryStr {
+	return &TaskRepositoryStr{db: db}
 }
 
-func (r *taskRepository) CreateTask(task Task) (Task, error) {
+func (r *TaskRepositoryStr) CreateTask(task Task) (Task, error) {
 	result := r.db.Create(&task)
 	if result.Error != nil {
 		return Task{}, result.Error
@@ -28,13 +28,13 @@ func (r *taskRepository) CreateTask(task Task) (Task, error) {
 	return task, nil
 }
 
-func (r *taskRepository) GetAllTasks() ([]Task, error) {
+func (r *TaskRepositoryStr) GetAllTasks() ([]Task, error) {
 	var tasks []Task
 	err := r.db.Find(&tasks).Error
 	return tasks, err
 }
 
-func (r *taskRepository) UpdateTaskByID(id uint, newTask Task) (Task, error) {
+func (r *TaskRepositoryStr) UpdateTaskByID(id uint, newTask Task) (Task, error) {
 	var task Task
 	err := r.db.First(&task, id).Error
 	if err != nil {
@@ -48,7 +48,7 @@ func (r *taskRepository) UpdateTaskByID(id uint, newTask Task) (Task, error) {
 	return task, err
 }
 
-func (r *taskRepository) DeleteTaskByID(id uint) error {
+func (r *TaskRepositoryStr) DeleteTaskByID(id uint) error {
 	var task Task
 	err := database.DB.First(&task, id).Error
 	if err != nil {
