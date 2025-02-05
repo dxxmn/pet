@@ -1,10 +1,10 @@
 package taskService
 
 type TaskService struct {
-	repo TaskRepository
+	repo TaskRepositoryInt
 }
 
-func NewService(repo TaskRepository) *TaskService {
+func NewService(repo TaskRepositoryInt) *TaskService {
 	return &TaskService{repo: repo}
 }
 
