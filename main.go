@@ -18,8 +18,35 @@ func CreateTasksHandler(w http.ResponseWriter, r *http.Request) {
 func GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 	var tasks []Task
 	DB.Find(&tasks)
-	fmt.Fprint(w, "Все задания\n")
 	json.NewEncoder(w).Encode(tasks)
+}
+
+func UpdateTasksHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	var task Task
+	err := DB.First(&task, id).Error
+	if err != nil {
+		fmt.Fprint(w, "Задача не найдена")
+		return
+	}
+	json.NewDecoder(r.Body).Decode(&task)
+	DB.Save(&task)
+	fmt.Fprint(w, "Задача обновлена\n")
+	json.NewEncoder(w).Encode(task)
+}
+
+func DeleteTasksHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	var task Task
+	err := DB.First(&task, id).Error
+	if err != nil {
+		http.Error(w, "Неверный запрос", http.StatusBadRequest)
+		return
+	}
+	DB.Delete(&task)
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func main() {
@@ -28,5 +55,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/api/tasks", CreateTasksHandler).Methods("POST")
 	router.HandleFunc("/api/tasks", GetTasksHandler).Methods("GET")
+	router.HandleFunc("/api/tasks/{id}", UpdateTasksHandler).Methods("PUT")
+	router.HandleFunc("/api/tasks/{id}", DeleteTasksHandler).Methods("DELETE")
 	http.ListenAndServe(":8080", router)
 }
