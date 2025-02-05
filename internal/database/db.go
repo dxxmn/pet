@@ -1,4 +1,4 @@
-package main
+package database
 
 import (
 	"gorm.io/driver/postgres"
@@ -8,7 +8,7 @@ import (
 
 var DB *gorm.DB
 
-func initDB() {
+func InitDB() {
 	dsn := "host=localhost user=postgres password=123123 dbname=postgres port=5432"
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
