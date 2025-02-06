@@ -10,6 +10,7 @@ type TaskRepositoryInt interface {
 	GetAllTasks() ([]Task, error)
 	UpdateTaskByID(id uint, task Task) (Task, error)
 	DeleteTaskByID(id uint) error
+	GetTaskByID(id uint) (Task, error)
 }
 
 type TaskRepositoryStr struct {
@@ -41,7 +42,9 @@ func (r *TaskRepositoryStr) UpdateTaskByID(id uint, newTask Task) (Task, error) 
 		return Task{}, err
 	}
 
-	task.Task = newTask.Task
+	if newTask.Task != "" {
+		task.Task = newTask.Task
+	}
 	task.IsDone = newTask.IsDone
 
 	r.db.Save(&task)
@@ -56,4 +59,13 @@ func (r *TaskRepositoryStr) DeleteTaskByID(id uint) error {
 	}
 	r.db.Delete(&task)
 	return nil
+}
+
+func (r *TaskRepositoryStr) GetTaskByID(id uint) (Task, error) {
+	var task Task
+	err := r.db.First(&task, id).Error
+	if err != nil {
+		return Task{}, err
+	}
+	return task, nil
 }
