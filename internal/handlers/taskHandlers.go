@@ -29,6 +29,7 @@ func (h *TaskHandler) GetTasks(ctx context.Context, request tasks.GetTasksReques
 			Id:     &tsk.ID,
 			Task:   &tsk.Task,
 			IsDone: &tsk.IsDone,
+			UserId: &tsk.UserId,
 		}
 		response = append(response, task)
 	}
@@ -42,6 +43,7 @@ func (h *TaskHandler) PostTasks(ctx context.Context, request tasks.PostTasksRequ
 	taskToCreate := taskService.Task{
 		Task:   *taskRequest.Task,
 		IsDone: *taskRequest.IsDone,
+		UserId: *taskRequest.UserId,
 	}
 
 	createdTask, err := h.Service.PostTasks(taskToCreate)
@@ -53,6 +55,7 @@ func (h *TaskHandler) PostTasks(ctx context.Context, request tasks.PostTasksRequ
 		Id:     &createdTask.ID,
 		Task:   &createdTask.Task,
 		IsDone: &createdTask.IsDone,
+		UserId: &createdTask.UserId,
 	}
 
 	return response, nil
@@ -67,6 +70,7 @@ func (h *TaskHandler) GetTasksId(ctx context.Context, request tasks.GetTasksIdRe
 		Id:     &task.ID,
 		Task:   &task.Task,
 		IsDone: &task.IsDone,
+		UserId: &task.UserId,
 	}
 	return response, nil
 }

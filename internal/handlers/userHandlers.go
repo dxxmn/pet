@@ -14,7 +14,7 @@ func NewUserHandler(service *userService.UserService) *UserHandler {
 	return &UserHandler{Service: service}
 }
 
-func (h UserHandler) GetUsers(ctx context.Context, request users.GetUsersRequestObject) (users.GetUsersResponseObject, error) {
+func (h *UserHandler) GetUsers(ctx context.Context, request users.GetUsersRequestObject) (users.GetUsersResponseObject, error) {
 	allUsers, err := h.Service.GetUsers()
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func (h UserHandler) GetUsers(ctx context.Context, request users.GetUsersRequest
 	return response, nil
 }
 
-func (h UserHandler) PostUsers(ctx context.Context, request users.PostUsersRequestObject) (users.PostUsersResponseObject, error) {
+func (h *UserHandler) PostUsers(ctx context.Context, request users.PostUsersRequestObject) (users.PostUsersResponseObject, error) {
 	userRequest := request.Body
 
 	user := userService.User{
@@ -57,7 +57,7 @@ func (h UserHandler) PostUsers(ctx context.Context, request users.PostUsersReque
 	return response, nil
 }
 
-func (h UserHandler) GetUsersId(ctx context.Context, request users.GetUsersIdRequestObject) (users.GetUsersIdResponseObject, error) {
+func (h *UserHandler) GetUsersId(ctx context.Context, request users.GetUsersIdRequestObject) (users.GetUsersIdResponseObject, error) {
 	user, err := h.Service.GetUsersId(request.Id)
 	if err != nil {
 		return nil, err
@@ -71,7 +71,7 @@ func (h UserHandler) GetUsersId(ctx context.Context, request users.GetUsersIdReq
 	return response, nil
 }
 
-func (h UserHandler) PatchUsersId(ctx context.Context, request users.PatchUsersIdRequestObject) (users.PatchUsersIdResponseObject, error) {
+func (h *UserHandler) PatchUsersId(ctx context.Context, request users.PatchUsersIdRequestObject) (users.PatchUsersIdResponseObject, error) {
 	userRequest := request.Body
 	user, err := h.Service.GetUsersId(request.Id)
 	if err != nil {
@@ -101,13 +101,33 @@ func (h UserHandler) PatchUsersId(ctx context.Context, request users.PatchUsersI
 
 }
 
-func (h UserHandler) DeleteUsersId(ctx context.Context, request users.DeleteUsersIdRequestObject) (users.DeleteUsersIdResponseObject, error) {
+func (h *UserHandler) DeleteUsersId(ctx context.Context, request users.DeleteUsersIdRequestObject) (users.DeleteUsersIdResponseObject, error) {
 	err := h.Service.DeleteUsersId(request.Id)
 	if err != nil {
 		return nil, err
 	}
 
 	response := users.DeleteUsersId204Response{}
+
+	return response, nil
+}
+
+func (h *UserHandler) GetUsersUserIdTasks(ctx context.Context, request users.GetUsersUserIdTasksRequestObject) (users.GetUsersUserIdTasksResponseObject, error) {
+	allTasks, err := h.Service.GetTasksForUser(request.UserId)
+	if err != nil {
+		return nil, err
+	}
+	response := users.GetUsersUserIdTasks200JSONResponse{}
+
+	for _, tsk := range allTasks {
+		task := users.Task{
+			Id:     &tsk.ID,
+			Task:   &tsk.Task,
+			IsDone: &tsk.IsDone,
+			UserId: &tsk.UserId,
+		}
+		response = append(response, task)
+	}
 
 	return response, nil
 }

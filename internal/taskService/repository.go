@@ -2,7 +2,6 @@ package taskService
 
 import (
 	"gorm.io/gorm"
-	"pet/internal/database"
 )
 
 type TaskRepositoryInt interface {
@@ -63,7 +62,7 @@ func (r *TaskRepositoryStr) UpdateTasksId(id uint, newTask Task) (Task, error) {
 
 func (r *TaskRepositoryStr) DeleteTasksId(id uint) error {
 	var task Task
-	err := database.DB.First(&task, id).Error
+	err := r.db.First(&task, id).Error
 	if err != nil {
 		return err
 	}
