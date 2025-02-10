@@ -4,23 +4,24 @@ type TaskService struct {
 	repo TaskRepositoryInt
 }
 
-func NewService(repo TaskRepositoryInt) *TaskService {
+func NewTaskService(repo TaskRepositoryInt) *TaskService {
 	return &TaskService{repo: repo}
 }
 
-func (s *TaskService) CreateTask(task Task) (Task, error) {
-	return s.repo.CreateTask(task)
+func (s *TaskService) GetTasks() ([]Task, error) {
+	return s.repo.GetTasks()
 }
 
-func (s *TaskService) GetAllTasks() ([]Task, error) {
-	return s.repo.GetAllTasks()
+func (s *TaskService) PostTasks(task Task) (Task, error) {
+	return s.repo.PostTasks(task)
 }
 
-func (s *TaskService) UpdateTaskByID(id uint, newTask Task) (Task, error) {
-	return s.repo.UpdateTaskByID(id, newTask)
+func (s *TaskService) GetTasksID(id uint) (Task, error) { return s.repo.GetTasksId(id) }
+
+func (s *TaskService) UpdateTasksID(id uint, newTask Task) (Task, error) {
+	return s.repo.UpdateTasksId(id, newTask)
 }
 
-func (s *TaskService) DeleteTaskByID(id uint) error {
-	return s.repo.DeleteTaskByID(id)
+func (s *TaskService) DeleteTasksID(id uint) error {
+	return s.repo.DeleteTasksId(id)
 }
-func (s *TaskService) GetTaskByID(id uint) (Task, error) { return s.repo.GetTaskByID(id) }
